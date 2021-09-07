@@ -32,8 +32,13 @@ def unlock_change_passwd():
                     ssh.connect(hostname=ip, port=22, username=username, password=pwd)
                     print('"%s" 连接成功' % ip)
                     stdin, stdout, stderr = ssh.exec_command('sudo pam_tally2 -r -u zxadmin')
-                    print(stdout.read())
+                    result=str(stdout.read())
+                    if 'zxadmin' in result:
+                        print('解锁成功')
+                    else:
+                        print('解锁失败')
                     ssh.close()
+                    break
                 except Exception as e:
                     print(e)
                     print("connection error")
@@ -44,13 +49,14 @@ def unlock_change_passwd():
                     ssh.connect(hostname=ip, port=22, username=username, password=pwd)
                     print('"%s" 连接成功' % ip)
                     stdin, stdout, stderr = ssh.exec_command(
-                        'sudo pam_tally2 -r -u zxadmin;sudo -i; echo 2qaz@WSX |passwd --stdin zxadmin', get_pty=True)
+                        "sudo pam_tally2 -r -u zxadmin;sudo su -c 'echo 1qaz@WSX |passwd --stdin zxadmin'", get_pty=True)
                     result = str(stdout.read())
                     if "successfully" in result:
                         print('%s change password is ok!' % ip)
                     else:
                         print('%s change password is failed!' % ip)
                     ssh.close()
+                    break
                 except Exception as e:
                     print(e)
                     print("connection error")
