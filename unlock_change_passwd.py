@@ -11,38 +11,51 @@ import paramiko
 
 
 def unlock_change_passwd():
-    p_file = open('passwd.txt', 'r')
+    p_file = open('unlock_change_pwd.txt', 'r')
     for l in p_file:
         inform = l.split()
         ip = inform[0]
         username = inform[1]
         pwd = inform[2]
-        try:
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy)
-            ssh.connect(hostname=ip,port=22, username=username, password=pwd)
-            print('"%s" 连接成功' % ip)
-            menus={
-                '1':'解锁',
-                '2':'改密码',
-                'q':'退出',
-            }
-            print(menus)
-            while True:
-                cmd = input('请输入:')
-                if cmd == '1':
-                    stdin, stdout, stderr = ssh.exec_command('sudo -i root;pam_tally2 -r -u zxadmin',get_pty=True)
-                if cmd == '2':
-                     stdin, stdout, stderr = ssh.exec_command('sudo -i root;pam_tally2 -r -u zxadmin;echo 1qaz@WSX |passwd --stdin zxadmin',get_pty=True)
+        menus = {
+            'a': '解锁',
+            'b': '改密码',
+            'q': '退出',
+        }
+        print(menus)
+        while True:
+            cmd = input('请输入:')
+            if cmd == 'a':
+                try:
+                    ssh = paramiko.SSHClient()
+                    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy)
+                    ssh.connect(hostname=ip, port=22, username=username, password=pwd)
+                    print('"%s" 连接成功' % ip)
+                    stdin, stdout, stderr = ssh.exec_command('sudo pam_tally2 -r -u zxadmin')
+                    print(stdout.read())
+                    ssh.close()
+                except Exception as e:
+                    print(e)
+                    print("connection error")
+            if cmd == 'b':
+                try:
+                    ssh = paramiko.SSHClient()
+                    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy)
+                    ssh.connect(hostname=ip, port=22, username=username, password=pwd)
+                    print('"%s" 连接成功' % ip)
+                    stdin, stdout, stderr = ssh.exec_command(
+                        'sudo pam_tally2 -r -u zxadmin;sudo -i; echo 2qaz@WSX |passwd --stdin zxadmin', get_pty=True)
                     result = str(stdout.read())
-                if "successfully" in result:
-                    print('%s change password is ok!' % ip)
-                if cmd == 'q':
-                    break
-                ssh.close()
-        except Exception as e:
-            print(e)
-            print("connection error")
+                    if "successfully" in result:
+                        print('%s change password is ok!' % ip)
+                    else:
+                        print('%s change password is failed!' % ip)
+                    ssh.close()
+                except Exception as e:
+                    print(e)
+                    print("connection error")
+            if cmd == 'q':
+                break
 
 
 if __name__ == '__main__':
