@@ -52,9 +52,9 @@ def unlock_change_passwd():
                         "sudo pam_tally2 -r -u zxadmin;sudo su -c 'echo 1qaz@WSX |passwd --stdin zxadmin'", get_pty=True)
                     result = str(stdout.read())
                     if "successfully" in result:
-                        print('%s change password is ok!' % ip)
+                        print('%s 修改密码成功!' % ip)
                     else:
-                        print('%s change password is failed!' % ip)
+                        print('%s 修改密码失败!' % ip)
                     ssh.close()
                     break
                 except Exception as e:
