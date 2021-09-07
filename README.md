@@ -3,3 +3,4 @@
 
 `change_passwd` 批量修改远程主机的密码
 
+`unlock_change_passwd.py`解决不是root账户操作远程主机问题
